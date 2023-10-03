@@ -192,8 +192,14 @@ public class Archive {
     }
 
     private static func open(fileURL: URL, password: String?, flags: inout RAROpenArchiveDataEx) -> UnsafeMutableRawPointer? {
+        var path: String
+        if #available(iOS 16.0, *) {
+            path = fileURL.path()
+        } else {
+            path = fileURL.path
+        }
         guard
-            let ptr = fileURL.path.utf8CString.withUnsafeBufferPointer({ (ptr) -> UnsafeMutableRawPointer? in
+            let ptr = path.utf8CString.withUnsafeBufferPointer({ (ptr) -> UnsafeMutableRawPointer? in
                 flags.ArcName = UnsafeMutablePointer(mutating: ptr.baseAddress)
                 return UnsafeMutableRawPointer(RAROpenArchiveEx(&flags))
             })
